@@ -1,13 +1,13 @@
 <?php
 /*********************************************************************************
-Un petit wrapper à osmconvert http://wiki.openstreetmap.org/wiki/Osmconvert.
+Un petit wrapper Ã  osmconvert http://wiki.openstreetmap.org/wiki/Osmconvert.
 
 On l'appel par http://x/osm2node?[Syntaxe XAPI]
-On l'appel avec la syntaxe de XAPI, il fait lui même un appel XAPI
-et renvoi tout objet osm simplifié en noeud (un noeud reste un noeud, mais way et relation 
-sont converti en un noeud positionné au centre approximatif).
+On l'appel avec la syntaxe de XAPI, il fait lui mÃªme un appel XAPI
+et renvoi tout objet osm simplifiÃ© en noeud (un noeud reste un noeud, mais way et relation 
+sont converti en un noeud positionnÃ© au centre approximatif).
 
-On peut aussi appelé le script avec "http://x/osm2nodegps?[Syntaxe XAPI]" et il fourni une conversion 
+On peut aussi appelÃ© le script avec "http://x/osm2nodegps?[Syntaxe XAPI]" et il fourni une conversion 
 de osm (noeud) en waypoint gpx
 
 sly sylvain@letuffe.org 28/11/2012
@@ -60,7 +60,7 @@ function osmnodes2gpx($osm_xml)
   return $gpx_en_tete.$gpx_wpts.$gpx_end;
 }
 
-// On prépare l'appel à osmconvert
+// On prÃ©pare l'appel Ã  osmconvert
 $descriptorspec = array(
    0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
    1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
@@ -68,22 +68,22 @@ $descriptorspec = array(
 
 $process = proc_open($config['osmconvert_path']." - --drop-relations --all-to-nodes --out-osm", $descriptorspec, $pipes);
 
-// On appel xapi avec exactement la même syntaxe qu'on nous a demandé
+// On appel xapi avec exactement la mÃªme syntaxe qu'on nous a demandÃ©
 $xapi_p=fopen($config['xapi_url'].$_SERVER['QUERY_STRING'],"r");
 $osm="";
 while (!feof($xapi_p)) 
 {
-  // Au fûr et à mesure on nourri, en flux, osmconvert
+  // Au fÃ»r et Ã  mesure on nourri, en flux, osmconvert
   $osm = fread($xapi_p, 8192);
   fwrite($pipes[0], $osm);
 }
 
 fclose($pipes[0]);
 
-// on récupère le fichier osm résultant en retirant les noeuds (pas super proprement) qui n'ont pas de tags
-// FIXME c'est pas parfait car osmconvert aurait pu avoir une option pour ça
+// on rÃ©cupÃ¨re le fichier osm rÃ©sultant en retirant les noeuds (pas super proprement) qui n'ont pas de tags
+// FIXME c'est pas parfait car osmconvert aurait pu avoir une option pour Ã§a
 // Donc on se retrouve avec des noeuds qui pourrait avoir un created_by / source ou autre tag sans rapport avec
-// la requête xapi initiale car ils étaient le composant d'un way qui lui a été converti en noeud
+// la requÃªte xapi initiale car ils Ã©taient le composant d'un way qui lui a Ã©tÃ© converti en noeud
 $osm_node_only="";
 while (!feof($pipes[1])) 
 {
@@ -100,7 +100,7 @@ if ( preg_match("/^\/osm2nodegpx/",$_SERVER['REQUEST_URI'])) // On veut des noeu
   $content_type="application/gpx";
   $xml=osmnodes2gpx($osm_node_only);
 }
-else // et par défaut, osm
+else // et par dÃ©faut, osm
 {
   $xml=$osm_node_only;
   $nom_fichier="osm2node.osm";
