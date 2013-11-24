@@ -69,7 +69,8 @@ $descriptorspec = array(
 $process = proc_open($config['osmconvert_path']." - --drop-relations --all-to-nodes --out-osm", $descriptorspec, $pipes);
 
 // On appel xapi avec exactement la même syntaxe qu'on nous a demandé
-$xapi_p=fopen($config['xapi_url'].$_SERVER['QUERY_STRING'],"r");
+if (!($xapi_p=fopen($config['xapi_url'].$_SERVER['QUERY_STRING'],"r")))
+  die("The Xapi request (la requête xapi): ".$config['xapi_url'].$_SERVER['QUERY_STRING']." returned no answer (n'a pas répondu)" ); 
 $osm="";
 while (!feof($xapi_p)) 
 {
