@@ -1,0 +1,5 @@
+#This enables 2 different call served by the same program
+RewriteEngine on
+Rewriterule (osm2node) osm2node.php
+Rewriterule (osm2nodegpx) osm2node.php
+
