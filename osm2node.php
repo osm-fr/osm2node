@@ -10,10 +10,11 @@ sont converti en un noeud positionné au centre approximatif).
 On peut aussi appelé le script avec "http://x/osm2nodegps?[Syntaxe XAPI]" et il fourni une conversion 
 de osm (noeud) en waypoint gpx
 
-sly sylvain@letuffe.org 28/11/2012
+Released under the WTFPL http://www.wtfpl.net/
+
+sly sylvain@letuffe.org 
 **********************************************************************************/
-$config['xapi_url']="http://api.openstreetmap.fr/xapi-without-meta?";
-$config['osmconvert_path']="../osmconvert/osmconvert";
+require_once("config.php");
 
 function osmnodes2gpx($osm_xml)
 {
@@ -66,11 +67,24 @@ $descriptorspec = array(
    1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
 );
 
+// Let's check what type of call we have, we suppose that if the form is ?data=* we face a overpass API syntax query, else a xapi syntax query
+if (isset($_GET['data']))
+{
+  $url_to_open=$config['oapi_url'];
+  $detected_syntax="Overpass API";
+}
+else
+{
+  $url_to_open=$config['xapi_url'];
+  $detected_syntax="Xapi";
+}
+
 $process = proc_open($config['osmconvert_path']." - --drop-relations --all-to-nodes --out-osm", $descriptorspec, $pipes);
 
-// On appel xapi avec exactement la même syntaxe qu'on nous a demandé
-if (!($xapi_p=fopen($config['xapi_url'].$_SERVER['QUERY_STRING'],"r")))
-  die("The Xapi request (la requête xapi): ".$config['xapi_url'].$_SERVER['QUERY_STRING']." returned no answer (n'a pas répondu)" ); 
+
+// We just forward the call to the other endpoint just like we where asked
+if (!($xapi_p=fopen($url_to_open.$_SERVER['QUERY_STRING'],"r")))
+  die("Your request (detected as $detected_syntax syntax) returned no answer. The call was : \n".$url_to_open.$_SERVER['QUERY_STRING']."\n"); 
 $osm="";
 while (!feof($xapi_p)) 
 {
