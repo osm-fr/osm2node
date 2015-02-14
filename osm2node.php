@@ -33,10 +33,12 @@ function osmnodes2gpx($osm_xml)
       else
         $gpx_tags="";
       $gpx_tags_extension="";
+      $name_tag="";
+      $tags_extension="";
       if (isset($node->tag))
       {
-	$gpx_tags_extension="\t\t\t<extensions>\n";
-	$at_least_one=false;
+	$at_least_one_tag=false;
+	$name_tag="";
 	foreach ( $node->tag as $tag )
 	{
 	  $tag['k']=c($tag['k']);
@@ -46,19 +48,27 @@ function osmnodes2gpx($osm_xml)
 	  if ($tag['k']=="created_by" or $tag['k']=="source")
 	    break;
 	  
-	  if ($tag['k']=="name")
-	    $gpx_tags.="\t\t<name>$tag[v]</name>\n";
+	  if ( ($tag['k']=="name" and $name_tag=="") or (isset($_GET['magouillefixme']) and $tag['k']=="fixme") ) // we allready have a tag name (presumably because we force the fixme into it with &magouillefixme earlier)
+	    $name_tag=$tag[v];
 	  else if ($tag['k']=="ele")
 	    $gpx_tags.="\t\t<ele>$tag[v]</ele>\n";
-	  else if ($_GET['magouillefixme'] and $tag['k']=="fixme")
-	    $gpx_tags.="\t\t<name>$tag[v]</name>\n";
 	  else
-	    $gpx_tags_extension.="\t\t\t\t<tag k=\"$tag[k]\" v=\"$tag[v]\"/>\n";
-	  $at_least_one=true;
+	    $tags_extension.="\t\t\t\t<tag k=\"$tag[k]\" v=\"$tag[v]\"/>\n";
+	  $at_least_one_tag=true;
 	}
-	$gpx_tags_extension.="\t\t\t</extensions>\n";
-	if ($at_least_one)
-	  $wpts.="$gpx_tags.$gpx_tags_extension\t</wpt>\n";
+	// Some gpx parseur (did I say osmand ?) crash when there is no name in the gpx, we can force this with &magouilleforceaname in the url
+	if ($name_tag=="" and isset($_GET['magouilleforceaname']))
+	  $name_tag="no";
+        if ($name_tag=="")
+          $gpx_name_line="";
+        else
+          $gpx_name_line="\t\t<name>".$name_tag."</name>\n";
+
+	if ($tags_extension!="")
+	  $gpx_tags_extension="\t\t\t<extensions>\n".$tags_extension."\t\t\t</extensions>\n";
+          
+	if ($at_least_one_tag)
+	  $wpts.=$gpx_tags.$gpx_name_line.$gpx_tags_extension."\t</wpt>\n";
         else
           $wpts="";
       }
