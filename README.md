@@ -3,6 +3,11 @@ osm2node
 A wrapper from a XAPI of Overpass API to provide converted output (with osmconvert) to nodes only, the output can either be osm or gpx 
 (this is an hugly but working converter that osmconvert cannot provide)
 
+Pass de special tweaked parameter in the url : &magouillefixme
+like :
+http://api.openstreetmap.fr/osm2nodegpx?*[bbox=5.71,45.37626,6.2752533,45.7301497][fixme=*]&magouillefixme
+and all th fixme=* will replace the poi's name
+
 I can be usefull when you want restaurant or hôtels drawn as polygons in the osm database to be converted to a virtual node in the centroid.
 (easier to process when the client tool does not provide this simplification)
 

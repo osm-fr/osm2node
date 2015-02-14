@@ -25,10 +25,9 @@ function osmnodes2gpx($osm_xml)
   $osm = simplexml_load_string($osm_xml);
   if (isset($osm->node))
   {
-    $gpx_wpts="";
     foreach ( $osm->node as $node )
     {
-      $gpx_wpts.="\t<wpt lat=\"$node[lat]\" lon=\"$node[lon]\">\n";
+      $wpts="\t<wpt lat=\"$node[lat]\" lon=\"$node[lon]\">\n";
       if (isset($node[timestamp]))
 	$gpx_tags="\t\t<time>$node[timestamp]</time>\n";
       else
@@ -37,21 +36,33 @@ function osmnodes2gpx($osm_xml)
       if (isset($node->tag))
       {
 	$gpx_tags_extension="\t\t\t<extensions>\n";
+	$at_least_one=false;
 	foreach ( $node->tag as $tag )
 	{
 	  $tag['k']=c($tag['k']);
 	  $tag['v']=c($tag['v']);
 	  
+	  // those tags are of low interest
+	  if ($tag['k']=="created_by" or $tag['k']=="source")
+	    break;
+	  
 	  if ($tag['k']=="name")
 	    $gpx_tags.="\t\t<name>$tag[v]</name>\n";
 	  else if ($tag['k']=="ele")
 	    $gpx_tags.="\t\t<ele>$tag[v]</ele>\n";
+	  else if ($_GET['magouillefixme'] and $tag['k']=="fixme")
+	    $gpx_tags.="\t\t<name>$tag[v]</name>\n";
 	  else
 	    $gpx_tags_extension.="\t\t\t\t<tag k=\"$tag[k]\" v=\"$tag[v]\"/>\n";
+	  $at_least_one=true;
 	}
 	$gpx_tags_extension.="\t\t\t</extensions>\n";
+	if ($at_least_one)
+	  $wpts.="$gpx_tags.$gpx_tags_extension\t</wpt>\n";
+        else
+          $wpts="";
       }
-      $gpx_wpts.="$gpx_tags$gpx_tags_extension\t</wpt>\n";
+      $gpx_wpts.=$wpts;
     }
   } 
     

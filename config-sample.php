@@ -11,14 +11,14 @@ $config['xapi_url']="http://api.openstreetmap.fr/xapi-without-meta?";
 //$config['xapi_url']="http://overpass.osm.rambler.ru/xapi?";
 
 // pick one Overpass API endpoint :
-//$config['oapi_url']="http://api.openstreetmap.fr/oapi/interpreter?";
+$config['oapi_url']="http://api.openstreetmap.fr/oapi/interpreter?";
 //$config['oapi_url']="http://overpass.osm.rambler.ru/cgi/interpreter?";                                                                               
-$config['oapi_url']="http://www.overpass-api.de/api/interpreter?";
+//$config['oapi_url']="http://www.overpass-api.de/api/interpreter?";
 
 
 // Either absolute, or relative to the directory this file is in
 // just set "osmconvert" if osmconvert is in your path
-$config['osmconvert_path']="osmconvert";
+$config['osmconvert_path']="/data/project/api.openstreetmap.fr/web/osm2node-git-tracked/osmconvert";
 
 
 ?>
